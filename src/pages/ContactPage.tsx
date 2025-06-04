@@ -20,15 +20,23 @@ const ContactPage: React.FC = () => {
                   <MapPin size={24} className="text-[#0E54CE] flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Адрес</h3>
-                    <p className="text-gray-600">123456, г. Москва, ул. Примерная, д. 1, офис 123</p>
+                    <p className="text-gray-600">140000, г. Павлодар, ул. Лермонтова, д. 93/2, этаж 1</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-4">
                   <Phone size={24} className="text-[#0E54CE] flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-1">Телефон</h3>
-                    <p className="text-gray-600">+7 (999) 123-45-67</p>
+                    <h3 className="font-semibold text-gray-800 mb-1">Телефон 1</h3>
+                    <p className="text-gray-600">+7 (705) 614‒07‒91</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <Phone size={24} className="text-[#0E54CE] flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-1">Телефон 2</h3>
+                    <p className="text-gray-600">+7 (775) 362-60-91</p>
                   </div>
                 </div>
                 
@@ -36,7 +44,7 @@ const ContactPage: React.FC = () => {
                   <Mail size={24} className="text-[#0E54CE] flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                    <p className="text-gray-600">info@homefind.ru</p>
+                    <p className="text-gray-600">real.pv@mail.ru</p>
                   </div>
                 </div>
                 
@@ -45,8 +53,8 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Режим работы</h3>
                     <p className="text-gray-600">
-                      Пн-Пт: 9:00 - 20:00<br />
-                      Сб: 10:00 - 18:00<br />
+                      Пн-Пт: 10:00 - 18:00<br />
+                      Сб: 10:00 - 14:00<br />
                       Вс: выходной
                     </p>
                   </div>
