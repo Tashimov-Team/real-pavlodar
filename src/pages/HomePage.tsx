@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
                 <Search className="text-[#0E54CE]" size={32} />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">Широкий выбор объектов</h3>
-              <p className="text-gray-600">Более 10 000 объектов недвижимости различного типа и стоимости</p>
+              <p className="text-gray-600">Более 500 объектов недвижимости различного типа и стоимости</p>
             </div>
             
             <div className="text-center">

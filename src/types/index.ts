@@ -21,11 +21,58 @@ export enum PropertyType {
   COMMERCIAL = 'commercial'
 }
 
+export enum DealType {
+  BUY = 'buy',
+  RENT = 'rent'
+}
+
+export enum BuildingType {
+  BRICK = 'brick',
+  PANEL = 'panel',
+  MONOLITHIC = 'monolithic',
+  WOODEN = 'wooden'
+}
+
+export enum BalconyType {
+  NONE = 'none',
+  BALCONY = 'balcony',
+  LOGGIA = 'loggia'
+}
+
+export enum FurnitureType {
+  NONE = 'none',
+  PARTIAL = 'partial',
+  FULL = 'full'
+}
+
+export enum FlooringType {
+  LAMINATE = 'laminate',
+  LINOLEUM = 'linoleum',
+  PARQUET = 'parquet',
+  TILE = 'tile',
+  CARPET = 'carpet'
+}
+
+export enum ParkingType {
+  NONE = 'none',
+  STREET = 'street',
+  GUARDED = 'guarded',
+  UNDERGROUND = 'underground'
+}
+
+export interface SecurityFeatures {
+  intercom: boolean;
+  cctv: boolean;
+  security: boolean;
+  concierge: boolean;
+}
+
 export interface Property {
   id: string;
   title: string;
   description: string;
   type: PropertyType;
+  dealType: DealType;
   price: number;
   area: number;
   rooms: number;
@@ -38,7 +85,14 @@ export interface Property {
   totalFloors?: number;
   isFirstFloor?: boolean;
   isLastFloor?: boolean;
-  hasFurniture?: boolean;
+  buildingType?: BuildingType;
+  constructionYear?: number;
+  balconyType?: BalconyType;
+  parkingType?: ParkingType;
+  furnitureType: FurnitureType;
+  flooringType?: FlooringType;
+  ceilingHeight?: number;
+  security: SecurityFeatures;
   images: string[];
   realtorId: string;
   createdAt: string;
@@ -47,6 +101,7 @@ export interface Property {
 }
 
 export interface PropertyFilters {
+  dealType?: DealType;
   type?: PropertyType;
   rooms?: number[];
   priceMin?: number;
@@ -55,7 +110,14 @@ export interface PropertyFilters {
   areaMax?: number;
   notFirstFloor?: boolean;
   notLastFloor?: boolean;
-  hasFurniture?: boolean;
+  hasPhotos?: boolean;
+  isNewBuilding?: boolean;
+  buildingType?: BuildingType[];
+  balconyType?: BalconyType[];
+  parkingType?: ParkingType[];
+  furnitureType?: FurnitureType[];
+  constructionYearMin?: number;
+  constructionYearMax?: number;
   coordinates?: {
     lat: number;
     lng: number;

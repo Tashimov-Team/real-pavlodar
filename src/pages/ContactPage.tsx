@@ -67,8 +67,6 @@ const ContactPage: React.FC = () => {
               <div className="absolute inset-0 flex items-center justify-center text-gray-500">
                 <p className="text-center">
                   Здесь будет карта с расположением офиса
-                  <br />
-                  <span className="text-sm">(Используйте Google Maps или Яндекс.Карты API)</span>
                 </p>
               </div>
             </div>

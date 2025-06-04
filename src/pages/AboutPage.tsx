@@ -9,7 +9,7 @@ const AboutPage: React.FC = () => {
         
         <div className="max-w-3xl mx-auto text-lg text-gray-600 mb-12">
           <p className="mb-4">
-            HomeFind — это современный сервис по подбору недвижимости, который помогает людям находить идеальные варианты для жизни и бизнеса. Мы работаем на рынке недвижимости с 2020 года и за это время помогли тысячам клиентов обрести новый дом.
+            Real — это современный сервис по подбору недвижимости, который помогает людям находить идеальные варианты для жизни и бизнеса. Мы работаем на рынке недвижимости более 12 лет и за это время помогли тысячам клиентов обрести новый дом.
           </p>
           <p>
             Наша миссия — сделать процесс поиска и покупки недвижимости максимально простым, безопасным и комфортным для каждого клиента.
@@ -21,7 +21,7 @@ const AboutPage: React.FC = () => {
             <div className="mb-4 mx-auto w-16 h-16 bg-[#0E54CE]/10 rounded-full flex items-center justify-center">
               <Building2 className="text-[#0E54CE]" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">5000+</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">500+</h3>
             <p className="text-gray-600">Объектов в базе</p>
           </div>
           
@@ -37,7 +37,7 @@ const AboutPage: React.FC = () => {
             <div className="mb-4 mx-auto w-16 h-16 bg-[#0E54CE]/10 rounded-full flex items-center justify-center">
               <Award className="text-[#0E54CE]" size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">50+</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">20+</h3>
             <p className="text-gray-600">Профессиональных риелторов</p>
           </div>
           

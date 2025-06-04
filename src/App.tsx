@@ -15,6 +15,7 @@ import RegisterPage from './pages/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { UserRole } from './types';
+import Loader from "./components/Loader.tsx";
 
 function App() {
   return (

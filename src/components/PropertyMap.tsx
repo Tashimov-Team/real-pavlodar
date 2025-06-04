@@ -70,8 +70,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ properties, onAreaSelect, hei
             <div className="absolute inset-0 flex items-center justify-center text-gray-500">
               <p className="text-center">
                 Здесь будет интерактивная карта с {properties.length} объектами
-                <br />
-                <span className="text-sm">(В реальном проекте используйте Google Maps или Яндекс.Карты API)</span>
               </p>
             </div>
             
