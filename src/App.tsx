@@ -16,6 +16,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { UserRole } from './types';
 import Loader from "./components/Loader.tsx";
+import SwipePage from "./pages/SwipePage.tsx";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="contact" element={<ContactPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
+              <Route path="swipe" element={<SwipePage />} />
               
               {/* Protected routes */}
               <Route 
