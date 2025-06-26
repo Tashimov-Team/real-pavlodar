@@ -20,6 +20,9 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   hasRole: (roles: UserRole[]) => boolean;
+  // Admin methods
+  createUser: (userData: any) => Promise<void>;
+  deleteUser: (id: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -94,13 +97,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, phone: string) => {
     setLoading(true);
     try {
+      // Note: This is using login as a placeholder since there's no specific register endpoint in the API
+      // In a real implementation, this would call a registration endpoint
       const { user: userData } = await apiService.login(email, password);
       setUser(userData);
     } catch (error) {
       console.error('Registration error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Admin methods
+  const createUser = async (userData: any) => {
+    setLoading(true);
+    try {
+      await apiService.createUser(userData);
+    } catch (error) {
+      console.error('Create user error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteUser = async (id: string) => {
+    setLoading(true);
+    try {
+      await apiService.deleteUser(id);
+    } catch (error) {
+      console.error('Delete user error:', error);
       throw error;
     } finally {
       setLoading(false);
@@ -132,7 +162,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             register,
             logout,
             isAuthenticated: !!user,
-            hasRole
+            hasRole,
+            createUser,
+            deleteUser
           }}
       >
         {children}

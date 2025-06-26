@@ -15,6 +15,15 @@ interface PropertiesContextType {
   toggleFavorite: (id: string) => Promise<void>;
   isPending: boolean;
   loadProperties: (filters?: PropertyFilters) => Promise<void>;
+
+  // Moderator methods
+  getModerationProperties: (filters?: PropertyFilters) => Promise<Property[]>;
+  updatePropertyStatus: (id: string, status: string) => Promise<void>;
+
+  // Admin methods
+  getStatistics: () => Promise<any>;
+  getApplications: (params?: Record<string, any>) => Promise<any[]>;
+  exportApplications: () => Promise<Blob>;
 }
 
 const PropertiesContext = createContext<PropertiesContextType | undefined>(undefined);
@@ -41,11 +50,11 @@ export const PropertiesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const convertFiltersToApiFormat = (localFilters: PropertyFilters) => {
     const apiFilters: any = {};
-    
+
     if (localFilters.dealType) {
       apiFilters.deal = localFilters.dealType === 'buy' ? 'sale' : 'rent';
     }
-    
+
     if (localFilters.type) {
       const typeMapping = {
         [PropertyType.SECONDARY]: 'apartment',
@@ -55,24 +64,24 @@ export const PropertiesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       };
       apiFilters.type = typeMapping[localFilters.type];
     }
-    
+
     if (localFilters.rooms && localFilters.rooms.length > 0) {
       apiFilters.rooms = localFilters.rooms[0]; // API expects single value
     }
-    
+
     if (localFilters.priceMin) apiFilters.price_from = localFilters.priceMin;
     if (localFilters.priceMax) apiFilters.price_to = localFilters.priceMax;
     if (localFilters.areaMin) apiFilters.area_from = localFilters.areaMin;
     if (localFilters.areaMax) apiFilters.area_to = localFilters.areaMax;
-    
+
     if (localFilters.isNewBuilding) apiFilters.is_new_building = true;
     if (localFilters.notFirstFloor) apiFilters.not_first_floor = true;
     if (localFilters.notLastFloor) apiFilters.not_last_floor = true;
     if (localFilters.hasPhotos) apiFilters.with_photos = true;
-    
+
     if (localFilters.constructionYearMin) apiFilters.year_from = localFilters.constructionYearMin;
     if (localFilters.constructionYearMax) apiFilters.year_to = localFilters.constructionYearMax;
-    
+
     return apiFilters;
   };
 
@@ -113,13 +122,13 @@ export const PropertiesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (apiType === 'apartment') {
       return isNewBuilding ? PropertyType.NEW_BUILDING : PropertyType.SECONDARY;
     }
-    
+
     const typeMapping: Record<string, PropertyType> = {
       house: PropertyType.HOUSE,
       commercial: PropertyType.COMMERCIAL,
       land: PropertyType.HOUSE
     };
-    
+
     return typeMapping[apiType] || PropertyType.SECONDARY;
   };
 
@@ -178,13 +187,78 @@ export const PropertiesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const deleteProperty = async (id: string) => {
     setIsPending(true);
     try {
-      // Note: Delete endpoint might not be available for all users
+      await apiService.deleteRealty(id);
       setProperties(prev => prev.filter(property => property.id !== id));
     } catch (error) {
       console.error('Error deleting property:', error);
       throw error;
     } finally {
       setIsPending(false);
+    }
+  };
+
+  // Moderator methods
+  const getModerationProperties = async (searchFilters?: PropertyFilters): Promise<Property[]> => {
+    setIsPending(true);
+    try {
+      const apiFilters = convertFiltersToApiFormat(searchFilters || filters);
+      const response = await apiService.getModerationRealties(apiFilters);
+      return response.data.map(convertApiPropertyToLocal);
+    } catch (error) {
+      console.error('Error loading moderation properties:', error);
+      return [];
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const updatePropertyStatus = async (id: string, status: string): Promise<void> => {
+    setIsPending(true);
+    try {
+      await apiService.updateRealtyStatus(id, status);
+      // Update local state if the property exists in the current list
+      setProperties(prev => 
+        prev.map(property => 
+          property.id === id ? { ...property, status } : property
+        )
+      );
+    } catch (error) {
+      console.error('Error updating property status:', error);
+      throw error;
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  // Admin methods
+  const getStatistics = async (): Promise<any> => {
+    try {
+      return await apiService.getStatistics();
+    } catch (error) {
+      console.error('Error getting statistics:', error);
+      throw error;
+    }
+  };
+
+  const getApplications = async (params: Record<string, any> = {}): Promise<any[]> => {
+    setIsPending(true);
+    try {
+      const response = await apiService.getApplications(params);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting applications:', error);
+      return [];
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const exportApplications = async (): Promise<Blob> => {
+    try {
+      return await apiService.exportApplications();
+    } catch (error) {
+      console.error('Error exporting applications:', error);
+      throw error;
     }
   };
 
@@ -240,6 +314,13 @@ export const PropertiesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         toggleFavorite,
         isPending,
         loadProperties,
+        // Moderator methods
+        getModerationProperties,
+        updatePropertyStatus,
+        // Admin methods
+        getStatistics,
+        getApplications,
+        exportApplications,
       }}
     >
       {children}

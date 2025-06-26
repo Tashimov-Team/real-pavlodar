@@ -181,6 +181,102 @@ class ApiService {
     const data = await this.handleResponse<ApiResponse<any>>(response);
     return data.data;
   }
+
+  // Moderator routes
+  async getModerationRealties(params: Record<string, any> = {}): Promise<PaginatedResponse<any>> {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    const response = await fetch(`${this.baseURL}/moderation/realties?${searchParams.toString()}`, {
+      headers: this.getHeaders(),
+    });
+
+    const data = await this.handleResponse<ApiResponse<PaginatedResponse<any>>>(response);
+    return data.data;
+  }
+
+  async updateRealtyStatus(id: string, status: string): Promise<any> {
+    const response = await fetch(`${this.baseURL}/moderation/realties/${id}/status`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ status }),
+    });
+
+    const data = await this.handleResponse<ApiResponse<any>>(response);
+    return data.data;
+  }
+
+  // Admin routes
+  async createUser(userData: any): Promise<any> {
+    const response = await fetch(`${this.baseURL}/users`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(userData),
+    });
+
+    const data = await this.handleResponse<ApiResponse<any>>(response);
+    return data.data;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    const response = await fetch(`${this.baseURL}/users/${id}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+
+    await this.handleResponse<ApiResponse<any>>(response);
+  }
+
+  async deleteRealty(id: string): Promise<void> {
+    const response = await fetch(`${this.baseURL}/realties/${id}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+
+    await this.handleResponse<ApiResponse<any>>(response);
+  }
+
+  async getStatistics(): Promise<any> {
+    const response = await fetch(`${this.baseURL}/admin/statistics`, {
+      headers: this.getHeaders(),
+    });
+
+    const data = await this.handleResponse<ApiResponse<any>>(response);
+    return data.data;
+  }
+
+  async getApplications(params: Record<string, any> = {}): Promise<PaginatedResponse<any>> {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(key, String(value));
+      }
+    });
+
+    const response = await fetch(`${this.baseURL}/admin/applications?${searchParams.toString()}`, {
+      headers: this.getHeaders(),
+    });
+
+    const data = await this.handleResponse<ApiResponse<PaginatedResponse<any>>>(response);
+    return data.data;
+  }
+
+  async exportApplications(): Promise<Blob> {
+    const response = await fetch(`${this.baseURL}/admin/applications/export`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.blob();
+  }
 }
 
 export const apiService = new ApiService();
