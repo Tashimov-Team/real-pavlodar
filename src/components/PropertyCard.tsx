@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, MapPin, Ruler, Home } from 'lucide-react';
+import { Heart, MapPin, Ruler, Home, User, Phone } from 'lucide-react';
 import { Property, PropertyType } from '../types';
 import { useProperties } from '../context/PropertiesContext';
+import { useAuth } from '../context/AuthContext';
 
 interface PropertyCardProps {
   property: Property;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
+  const { user } = useAuth();
   const { toggleFavorite, favoriteProperties } = useProperties();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isToggling, setIsToggling] = useState(false);
   
   const isFavorite = favoriteProperties.includes(property.id);
   
@@ -24,7 +27,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: 'RUB',
+      currency: 'KZT',
       maximumFractionDigits: 0,
     }).format(price);
   };
@@ -49,10 +52,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     }
   };
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(property.id);
+    
+    if (!user) return;
+    
+    setIsToggling(true);
+    try {
+      await toggleFavorite(property.id);
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   return (
@@ -60,19 +73,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
         {/* Image section with navigation */}
         <div className="relative h-48 overflow-hidden">
-          <img
-            src={property.images[currentImageIndex]}
-            alt={property.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          {property.images && property.images.length > 0 ? (
+            <img
+              src={property.images[currentImageIndex]}
+              alt={property.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <Home size={48} className="text-gray-400" />
+            </div>
+          )}
           
           {/* Image counter */}
-          <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs py-1 px-2 rounded-full">
-            {currentImageIndex + 1} / {property.images.length}
-          </div>
+          {property.images && property.images.length > 1 && (
+            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs py-1 px-2 rounded-full">
+              {currentImageIndex + 1} / {property.images.length}
+            </div>
+          )}
           
           {/* Image navigation */}
-          {property.images.length > 1 && (
+          {property.images && property.images.length > 1 && (
             <>
               <button
                 onClick={handlePrevImage}
@@ -94,15 +115,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           )}
           
           {/* Favorite button */}
-          <button
-            onClick={handleFavoriteClick}
-            className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-md transition-transform duration-300 hover:scale-110"
-          >
-            <Heart 
-              size={18} 
-              className={isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-500'} 
-            />
-          </button>
+          {user && (
+            <button
+              onClick={handleFavoriteClick}
+              disabled={isToggling}
+              className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-md transition-transform duration-300 hover:scale-110 disabled:opacity-50"
+            >
+              <Heart 
+                size={18} 
+                className={isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-500'} 
+              />
+            </button>
+          )}
           
           {/* Property type badge */}
           <div className="absolute top-2 left-2 bg-[#0E54CE] text-white text-xs py-1 px-2 rounded-md">
@@ -125,7 +149,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <span className="truncate">{property.address}</span>
           </div>
           
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mb-3">
             <div className="flex items-center text-gray-700">
               <Home size={16} className="mr-1" />
               <span>{property.rooms} {property.rooms === 1 ? 'комната' : property.rooms < 5 ? 'комнаты' : 'комнат'}</span>
@@ -142,6 +166,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               </div>
             )}
           </div>
+
+          {/* Owner info (only for realtors) */}
+          {user?.role === 'realtor' && property.ownerName && (
+            <div className="border-t pt-3 mt-3">
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                <User size={14} />
+                <span>{property.ownerName}</span>
+              </div>
+              {property.ownerPhone && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Phone size={14} />
+                  <span>{property.ownerPhone}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Link>

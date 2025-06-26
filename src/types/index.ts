@@ -2,7 +2,7 @@ export enum UserRole {
   GUEST = 'guest',
   REALTOR = 'realtor',
   MODERATOR = 'moderator',
-  ADMIN = 'admin'
+  ADMIN = 'administrator'
 }
 
 export interface User {
@@ -98,6 +98,15 @@ export interface Property {
   createdAt: string;
   updatedAt: string;
   isApproved: boolean;
+  // Additional API fields
+  ownerName?: string;
+  ownerPhone?: string;
+  yearBuilt?: number;
+  balcony?: string;
+  parking?: string;
+  flooring?: string;
+  status?: string;
+  hasFurniture?: boolean;
 }
 
 export interface PropertyFilters {

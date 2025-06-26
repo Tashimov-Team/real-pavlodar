@@ -5,6 +5,8 @@ import { PropertiesProvider } from './context/PropertiesContext';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import CatalogPage from './pages/CatalogPage';
+import FeedPage from './pages/FeedPage';
+import FavoritesPage from './pages/FavoritesPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import PropertyDetailPage from './pages/PropertyDetailPage';
@@ -26,6 +28,8 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="catalog" element={<CatalogPage />} />
+              <Route path="feed" element={<FeedPage />} />
+              <Route path="favorites" element={<FavoritesPage />} />
               <Route path="property/:id" element={<PropertyDetailPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />

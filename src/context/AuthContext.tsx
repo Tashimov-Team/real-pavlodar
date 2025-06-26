@@ -1,5 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '../types';
+import { apiService } from '../services/api';
+
+// Функция проверки истечения JWT-токена
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp < Date.now() / 1000;
+  } catch (e) {
+    return true;
+  }
+}
 
 interface AuthContextType {
   user: User | null;
@@ -18,39 +29,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved user in localStorage
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('user');
+    const token = localStorage.getItem('auth_token');
+
+    if (token) {
+      // Проверка истечения токена
+
+      // Использование кэшированных данных
+      const cachedUser = localStorage.getItem('auth_user');
+      if (cachedUser) {
+        try {
+          setUser(JSON.parse(cachedUser));
+          setLoading(false);
+          return;
+        } catch (e) {
+          localStorage.removeItem('auth_user');
+        }
       }
+
+      // Запрос данных пользователя
+      apiService.getUser()
+          .then(userData => {
+            setUser(userData);
+            localStorage.setItem('auth_user', JSON.stringify(userData));
+          })
+          .catch(error => {
+            console.error('Error getting user:', error);
+            localStorage.removeItem('auth_token');
+            setUser(null);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
+  }, []);
+
+  // Синхронизация между вкладками
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'auth_token') {
+        if (!e.newValue) {
+          setUser(null);
+        } else {
+          window.location.reload(); // Обновление данных при изменении токена
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const login = async (email: string, password: string) => {
-    // This would be replaced with an actual API call
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock user data - would come from backend
-      const mockUser: User = {
-        id: 'user-1',
-        name: 'John Doe',
-        email,
-        role: email.includes('admin') ? UserRole.ADMIN : 
-              email.includes('moderator') ? UserRole.MODERATOR : 
-              UserRole.REALTOR,
-        phone: '+1234567890'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      const { user: userData } = await apiService.login(email, password);
+      setUser(userData);
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -59,24 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string, phone: string) => {
-    // This would be replaced with an actual API call
+  const register = async (name: string, email: string, password: string) => {
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock user data - would come from backend
-      const mockUser: User = {
-        id: 'user-' + Date.now(),
-        name,
-        email,
-        role: UserRole.REALTOR,
-        phone
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      const { user: userData } = await apiService.login(email, password);
+      setUser(userData);
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -85,9 +107,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('auth_user');
+    }
   };
 
   const hasRole = (roles: UserRole[]) => {
@@ -96,19 +124,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        loading, 
-        login, 
-        register, 
-        logout, 
-        isAuthenticated: !!user,
-        hasRole
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider
+          value={{
+            user,
+            loading,
+            login,
+            register,
+            logout,
+            isAuthenticated: !!user,
+            hasRole
+          }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
 };
 

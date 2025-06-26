@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropertyFilter from '../components/PropertyFilter';
 import PropertyCard from '../components/PropertyCard';
 import PropertyMap from '../components/PropertyMap';
@@ -6,8 +6,16 @@ import { useProperties } from '../context/PropertiesContext';
 import { PropertyFilters } from '../types';
 
 const CatalogPage: React.FC = () => {
-  const { filteredProperties, filters, setFilters } = useProperties();
+  const { filteredProperties, filters, setFilters, loadProperties, isPending } = useProperties();
   const [showMap, setShowMap] = useState(false);
+
+  useEffect(() => {
+    loadProperties();
+  }, []);
+
+  useEffect(() => {
+    loadProperties(filters);
+  }, [filters]);
 
   const handleAreaSelect = (bounds: {north: number, south: number, east: number, west: number}) => {
     setFilters({
@@ -34,6 +42,12 @@ const CatalogPage: React.FC = () => {
           onFilterChange={setFilters}
         />
 
+        {isPending && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0E54CE]"></div>
+          </div>
+        )}
+
         {showMap ? (
           <PropertyMap 
             properties={filteredProperties}
@@ -45,6 +59,13 @@ const CatalogPage: React.FC = () => {
             {filteredProperties.map(property => (
               <PropertyCard key={property.id} property={property} />
             ))}
+          </div>
+        )}
+
+        {!isPending && filteredProperties.length === 0 && (
+          <div className="text-center py-16">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Объекты не найдены</h2>
+            <p className="text-gray-600">Попробуйте изменить параметры поиска</p>
           </div>
         )}
       </div>
