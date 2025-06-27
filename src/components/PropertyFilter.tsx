@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { SlidersHorizontal, ChevronDown, ChevronUp, Home, Building2, DollarSign, Ruler } from 'lucide-react';
 import { PropertyFilters, PropertyType, DealType, BuildingType, BalconyType, ParkingType, FurnitureType } from '../types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PropertyFilterProps {
   filters: PropertyFilters;
   onFilterChange: (filters: PropertyFilters) => void;
 }
+
+const buttonHover = { scale: 1.05, transition: { duration: 0.2 } };
+const buttonTap = { scale: 0.95 };
+const indicatorVariants = {
+  buy: { x: 0, width: '50%' },
+  rent: { x: '100%', width: '50%' },
+};
 
 const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange }) => {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -59,30 +67,66 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       {/* Deal Type Selection */}
-      <div className="mb-6">
-        <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
-          <button
-            onClick={() => handleDealTypeChange(DealType.BUY)}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              filters.dealType === DealType.BUY || !filters.dealType
-                ? 'bg-white shadow text-[#0E54CE]'
-                : 'text-gray-600 hover:text-[#0E54CE]'
-            }`}
+      <motion.div className="mb-6 relative">
+        <div className="flex gap-2 p-1 rounded-lg w-fit relative overflow-hidden">
+          {/* Liquid Glass Background */}
+          <div className="absolute inset-0 bg-white/30 backdrop-blur-sm rounded-lg" />
+
+          {/* Sliding Indicator */}
+          <motion.div
+              className="absolute top-1 bottom-1 left-1 bg-[#0E54CE]/10 backdrop-blur-sm rounded-md shadow"
+              variants={indicatorVariants}
+              animate={filters.dealType === DealType.RENT ? 'rent' : 'buy'}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          />
+
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
+              onClick={() => handleDealTypeChange(DealType.BUY)}
+              className={`relative z-10 px-4 py-2 rounded-md transition-colors ${
+                  filters.dealType === DealType.BUY || !filters.dealType
+                      ? 'text-[#0E54CE] font-medium'
+                      : 'text-gray-600 hover:text-[#0E54CE]'
+              }`}
           >
-            Купить
-          </button>
-          <button
-            onClick={() => handleDealTypeChange(DealType.RENT)}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              filters.dealType === DealType.RENT
-                ? 'bg-white shadow text-[#0E54CE]'
-                : 'text-gray-600 hover:text-[#0E54CE]'
-            }`}
+            <AnimatePresence mode="wait">
+              <motion.span
+                  key={filters.dealType === DealType.BUY || !filters.dealType ? 'buy' : 'buy-inactive'}
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+              >
+                Купить
+              </motion.span>
+            </AnimatePresence>
+          </motion.button>
+
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
+              onClick={() => handleDealTypeChange(DealType.RENT)}
+              className={`relative z-10 px-4 py-2 rounded-md transition-colors ${
+                  filters.dealType === DealType.RENT
+                      ? 'text-[#0E54CE] font-medium'
+                      : 'text-gray-600 hover:text-[#0E54CE]'
+              }`}
           >
-            Снять
-          </button>
+            <AnimatePresence mode="wait">
+              <motion.span
+                  key={filters.dealType === DealType.RENT ? 'rent' : 'rent-inactive'}
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -10, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+              >
+                Снять
+              </motion.span>
+            </AnimatePresence>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Property Type Selection */}
       <div className="mb-6">
@@ -99,7 +143,9 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
             <Home size={20} />
             <span>Все</span>
           </button>
-          <button
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleTypeChange(PropertyType.SECONDARY)}
             className={`py-3 px-4 rounded-lg border ${
               filters.type === PropertyType.SECONDARY 
@@ -109,8 +155,10 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           >
             <Building2 size={20} />
             <span>Вторичная</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleTypeChange(PropertyType.NEW_BUILDING)}
             className={`py-3 px-4 rounded-lg border ${
               filters.type === PropertyType.NEW_BUILDING 
@@ -120,8 +168,10 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           >
             <Building2 size={20} />
             <span>Новостройки</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleTypeChange(PropertyType.HOUSE)}
             className={`py-3 px-4 rounded-lg border ${
               filters.type === PropertyType.HOUSE 
@@ -131,14 +181,16 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           >
             <Home size={20} />
             <span>Дома</span>
-          </button>
+          </motion.button>
         </div>
       </div>
       
       {/* Quick Filters */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-3">
-          <button
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleAdvancedFilterChange('hasPhotos', !filters.hasPhotos)}
             className={`px-4 py-2 rounded-lg border ${
               filters.hasPhotos
@@ -147,8 +199,10 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
             } transition-colors`}
           >
             С фото
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleAdvancedFilterChange('isNewBuilding', !filters.isNewBuilding)}
             className={`px-4 py-2 rounded-lg border ${
               filters.isNewBuilding
@@ -157,7 +211,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
             } transition-colors`}
           >
             Новостройка
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -166,7 +220,9 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
         <h3 className="text-lg font-semibold text-gray-800 mb-3">Количество комнат</h3>
         <div className="flex flex-wrap gap-2">
           {[1, 2, 3, 4].map(room => (
-            <button
+            <motion.button
+                whileHover={buttonHover}
+                whileTap={buttonTap}
               key={room}
               onClick={() => handleRoomChange(room)}
               className={`min-w-[60px] py-2 px-4 rounded-lg border ${
@@ -176,9 +232,11 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
               } transition-colors`}
             >
               {room}
-            </button>
+            </motion.button>
           ))}
-          <button
+          <motion.button
+              whileHover={buttonHover}
+              whileTap={buttonTap}
             onClick={() => handleRoomChange(5)}
             className={`min-w-[60px] py-2 px-4 rounded-lg border ${
               filters.rooms?.includes(5)
@@ -187,7 +245,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
             } transition-colors`}
           >
             5+
-          </button>
+          </motion.button>
         </div>
       </div>
       
@@ -200,20 +258,22 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           </h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <input
+              <motion.input
                 type="number"
                 placeholder="От"
                 value={filters.priceMin || ''}
                 onChange={handlePriceMinChange}
+                whileFocus={{ scale:1.02 }}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0E54CE]"
               />
             </div>
             <div>
-              <input
+              <motion.input
                 type="number"
                 placeholder="До"
                 value={filters.priceMax || ''}
                 onChange={handlePriceMaxChange}
+                whileFocus={{ scale:1.02 }}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0E54CE]"
               />
             </div>
@@ -227,7 +287,8 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           </h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <input
+              <motion.input
+                  whileFocus={{ scale:1.02 }}
                 type="number"
                 placeholder="От"
                 value={filters.areaMin || ''}
@@ -236,7 +297,8 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
               />
             </div>
             <div>
-              <input
+              <motion.input
+                  whileFocus={{ scale:1.02 }}
                 type="number"
                 placeholder="До"
                 value={filters.areaMax || ''}
@@ -250,7 +312,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
       
       {/* Advanced Filters */}
       <div className="border-t pt-4">
-        <button 
+        <motion.button
           onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
           className="flex items-center text-[#0E54CE] hover:text-[#0E54CE]/80"
         >
@@ -261,7 +323,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ filters, onFilterChange
           ) : (
             <ChevronDown size={20} className="ml-2" />
           )}
-        </button>
+        </motion.button>
         
         {isAdvancedOpen && (
           <div className="mt-6 space-y-6">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 
 interface ContactModalProps {
@@ -52,8 +53,18 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, propertyId
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative overflow-hidden">
+    <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.95 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.8, 0.25, 1] }}
+          className="bg-white rounded-lg shadow-xl w-full max-w-md relative overflow-hidden">
         {/* Close button */}
         <button 
           onClick={onClose}
@@ -138,8 +149,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, propertyId
             </form>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

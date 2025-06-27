@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Building2, Search, Shield, Clock, Phone, MapPin, Home } from 'lucide-react';
 import ContactModal from '../components/ContactModal';
 import { PropertyType, DealType } from '../types';
+import { motion } from "framer-motion";
 import { useProperties } from '../context/PropertiesContext';
 
 const HomePage: React.FC = () => {
@@ -18,6 +19,17 @@ const HomePage: React.FC = () => {
 
   // Get top 5 properties (in a real app, this would be based on views/popularity)
   const topProperties = properties.slice(0, 5);
+
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.2 } }
+  };
+
+  const itemFadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.8, 0.25, 1] } }
+  };
+
 
   const handleQuickSearch = () => {
     const searchParams = new URLSearchParams();
@@ -35,24 +47,35 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative h-screen">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-gray-900">
-          <img
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="absolute inset-0 bg-gray-900">
+          <motion.img
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
               src="https://images.pexels.com/photos/1642125/pexels-photo-1642125.jpeg"
               alt="Modern building"
               className="w-full h-full object-cover opacity-50"
           />
-        </div>
+        </motion.div>
 
         {/* Content */}
-        <div className="relative h-full flex items-center">
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="relative h-full flex items-center">
           <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
+            <motion.div variants={itemFadeInUp}  className="max-w-5xl mx-auto">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight text-center">
                 Найдите идеальную недвижимость вместе с нами
               </h1>
 
               {/* Quick Search Filters */}
-              <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+              <motion.div variants={itemFadeInUp}  className="bg-white rounded-lg shadow-lg p-6 mb-8">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   {['Купить', 'Снять'].map(type => (
                       <button
@@ -160,10 +183,10 @@ const HomePage: React.FC = () => {
                     Сбросить
                   </button>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Top Properties Section */}

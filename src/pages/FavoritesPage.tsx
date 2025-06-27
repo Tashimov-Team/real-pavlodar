@@ -58,24 +58,6 @@ const FavoritesPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    loadFavorites();
-  }, [user]);
-
-  if (!user) {
-    return (
-      <div className="pt-20 min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <Heart size={64} className="mx-auto text-gray-400 mb-4" />
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Войдите в аккаунт</h1>
-            <p className="text-gray-600">Чтобы просматривать избранные объекты, необходимо войти в систему</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="pt-20 min-h-screen bg-gray-50">
