@@ -4,6 +4,7 @@ import { Heart, MapPin, Ruler, Home, User, Phone } from 'lucide-react';
 import { Property, PropertyType } from '../types';
 import { useProperties } from '../context/PropertiesContext';
 import { useAuth } from '../context/AuthContext';
+import RealtorContactCard from './RealtorContactCard';
 
 interface PropertyCardProps {
   property: Property;
@@ -69,8 +70,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   };
 
   return (
-    <Link to={`/property/${property.id}`} className="group">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <Link to={`/property/${property.id}`} className="group block">
         {/* Image section with navigation */}
         <div className="relative h-48 overflow-hidden">
           {property.images && property.images.length > 0 ? (
@@ -133,9 +134,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             {propertyTypeLabels[property.type]}
           </div>
         </div>
-        
-        {/* Content */}
-        <div className="p-4">
+      </Link>
+      
+      {/* Content */}
+      <div className="p-4">
+        <Link to={`/property/${property.id}`}>
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-bold text-gray-800 line-clamp-1">{property.title}</h3>
           </div>
@@ -166,25 +169,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               </div>
             )}
           </div>
+        </Link>
 
-          {/* Owner info (only for realtors) */}
-          {user?.role === 'realtor' && property.ownerName && (
-            <div className="border-t pt-3 mt-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                <User size={14} />
-                <span>{property.ownerName}</span>
-              </div>
-              {property.ownerPhone && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Phone size={14} />
-                  <span>{property.ownerPhone}</span>
-                </div>
-              )}
+        {/* Realtor contact info for guests */}
+        {!user && property.ownerName && (
+          <div className="border-t pt-3 mt-3">
+            <RealtorContactCard
+              name={property.ownerName}
+              phone={property.ownerPhone || ''}
+              avatar={property.realtorAvatar}
+            />
+          </div>
+        )}
+
+        {/* Owner info (only for authenticated realtors) */}
+        {user?.role === 'realtor' && property.ownerName && (
+          <div className="border-t pt-3 mt-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+              <User size={14} />
+              <span>{property.ownerName}</span>
             </div>
-          )}
-        </div>
+            {property.ownerPhone && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Phone size={14} />
+                <span>{property.ownerPhone}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </Link>
+    </div>
   );
 };
 

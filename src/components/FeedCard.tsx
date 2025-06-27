@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, MapPin, Ruler, Home, Phone, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiService } from '../services/api';
+import RealtorContactCard from './RealtorContactCard';
 
 interface FeedCardProps {
   property: any;
@@ -77,8 +78,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ property, onFavoriteToggle }) => {
   };
 
   return (
-    <Link to={`/property/${property.id}`} className="group block">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <Link to={`/property/${property.id}`} className="group block">
         {/* Image section */}
         <div className="relative h-48 overflow-hidden">
           {property.images && property.images.length > 0 ? (
@@ -146,9 +147,11 @@ const FeedCard: React.FC<FeedCardProps> = ({ property, onFavoriteToggle }) => {
             </div>
           </div>
         </div>
-        
-        {/* Content */}
-        <div className="p-4">
+      </Link>
+      
+      {/* Content */}
+      <div className="p-4">
+        <Link to={`/property/${property.id}`}>
           <div className="flex justify-between items-start mb-2">
             <div className="text-2xl font-bold text-[#0E54CE] mb-2">
               {formatPrice(property.price)}
@@ -182,31 +185,42 @@ const FeedCard: React.FC<FeedCardProps> = ({ property, onFavoriteToggle }) => {
             )}
           </div>
 
-          {/* Owner info (only for realtors) */}
-          {user?.role === 'realtor' && property.name && (
-            <div className="border-t pt-3 mt-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                <User size={14} />
-                <span>{property.name}</span>
-              </div>
-              {property.phone && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Phone size={14} />
-                  <span>{property.phone}</span>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Description preview */}
           {property.description && (
             <p className="text-gray-600 text-sm mt-2 line-clamp-2">
               {property.description}
             </p>
           )}
-        </div>
+        </Link>
+
+        {/* Realtor contact info for guests */}
+        {!user && property.name && (
+          <div className="border-t pt-3 mt-3">
+            <RealtorContactCard
+              name={property.name}
+              phone={property.phone || ''}
+              avatar={property.realtorAvatar}
+            />
+          </div>
+        )}
+
+        {/* Owner info (only for authenticated realtors) */}
+        {user?.role === 'realtor' && property.name && (
+          <div className="border-t pt-3 mt-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+              <User size={14} />
+              <span>{property.name}</span>
+            </div>
+            {property.phone && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Phone size={14} />
+                <span>{property.phone}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </Link>
+    </div>
   );
 };
 
